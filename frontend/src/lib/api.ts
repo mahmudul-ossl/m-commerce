@@ -17,6 +17,28 @@ type ApiOptions = Omit<RequestInit, "body"> & {
 
 const MUTATING_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
 
+const CART_TOKEN_KEY = "cart_token";
+
+/** Guest cart token, kept in localStorage and sent as X-Cart-Token. */
+export function getCartToken(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(CART_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setCartToken(token: string | null): void {
+  if (typeof window === "undefined") return;
+  try {
+    if (token) window.localStorage.setItem(CART_TOKEN_KEY, token);
+    else window.localStorage.removeItem(CART_TOKEN_KEY);
+  } catch {
+    // Storage can be unavailable (private mode); the cart then lasts for this page only.
+  }
+}
+
 function readCookie(name: string): string | undefined {
   if (typeof document === "undefined") return undefined;
   const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
@@ -43,6 +65,7 @@ export async function api<T>(path: string, { body, headers, ...init }: ApiOption
   }
 
   const xsrfToken = readCookie("XSRF-TOKEN");
+  const cartToken = getCartToken();
 
   const response = await fetch(`${API_URL}/api${path}`, {
     ...init,
@@ -52,6 +75,7 @@ export async function api<T>(path: string, { body, headers, ...init }: ApiOption
       Accept: "application/json",
       ...(body !== undefined && { "Content-Type": "application/json" }),
       ...(xsrfToken && { "X-XSRF-TOKEN": xsrfToken }),
+      ...(cartToken && { "X-Cart-Token": cartToken }),
       ...headers,
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,

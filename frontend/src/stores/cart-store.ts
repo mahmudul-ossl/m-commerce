@@ -1,12 +1,14 @@
 import { create } from "zustand";
 
-type CartState = {
-  /** Number of items in the cart, shown on the header badge. Filled in Phase 4. */
-  count: number;
-  setCount: (count: number) => void;
+type CartUiState = {
+  /** Whether the slide-over cart drawer is open. */
+  drawerOpen: boolean;
+  openDrawer: () => void;
+  setDrawerOpen: (open: boolean) => void;
 };
 
-export const useCartStore = create<CartState>((set) => ({
-  count: 0,
-  setCount: (count) => set({ count }),
+export const useCartStore = create<CartUiState>((set) => ({
+  drawerOpen: false,
+  openDrawer: () => set({ drawerOpen: true }),
+  setDrawerOpen: (drawerOpen) => set({ drawerOpen }),
 }));

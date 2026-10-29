@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 
+import { CartDrawer } from "@/components/cart/cart-drawer";
 import { AccountButton } from "@/components/layout/account-button";
 import { CartButton } from "@/components/layout/cart-button";
 import { HeaderShell } from "@/components/layout/header-shell";
@@ -39,6 +40,7 @@ export function SiteHeader() {
           </div>
         </div>
       </HeaderShell>
+      <CartDrawer />
     </>
   );
 }

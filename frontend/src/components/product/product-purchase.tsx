@@ -2,10 +2,10 @@
 
 import { Banknote, Minus, Plus, RotateCcw, ShoppingBag, Truck } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
 
 import { Price } from "@/components/product/price";
 import { Button } from "@/components/ui/button";
+import { useAddToCart } from "@/hooks/use-cart";
 import { swatchColor } from "@/lib/colors";
 import type { Product, ProductVariant } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -51,11 +51,10 @@ export function ProductPurchase({ product }: { product: Product }) {
     setQuantity(1);
   };
 
+  const add = useAddToCart();
   const addToCart = () => {
-    // TODO(Phase 4): add the variant to the cart via the API.
-    toast.info("The cart opens in the next update.", {
-      description: `${product.name}${variant && Object.keys(variant.options).length ? ` (${Object.values(variant.options).join(" / ")})` : ""} × ${quantity}`,
-    });
+    if (!variant) return;
+    add.mutate({ variantId: variant.id, quantity }, { onSuccess: () => setQuantity(1) });
   };
 
   // Show a sticky add-to-cart bar on phones once the main buttons scroll up under the header.
@@ -82,7 +81,7 @@ export function ProductPurchase({ product }: { product: Product }) {
 
   const price = variant?.price ?? product.price;
   const currentPrice = variant?.current_price ?? product.current_price;
-  const buttonLabel = !variant ? "Select options" : inStock ? "Add to cart" : "Out of stock";
+  const buttonLabel = add.isPending ? "Adding…" : !variant ? "Select options" : inStock ? "Add to cart" : "Out of stock";
 
   return (
     <div className="space-y-7">
@@ -168,7 +167,7 @@ export function ProductPurchase({ product }: { product: Product }) {
         <Button
           size="lg"
           onClick={addToCart}
-          disabled={!inStock}
+          disabled={!inStock || add.isPending}
           className="h-12 flex-1 gap-2 rounded-full text-base"
         >
           <ShoppingBag className="size-5" />
@@ -202,7 +201,7 @@ export function ProductPurchase({ product }: { product: Product }) {
           </div>
           <Button
             onClick={addToCart}
-            disabled={!inStock}
+            disabled={!inStock || add.isPending}
             tabIndex={showSticky ? 0 : -1}
             className="h-11 gap-2 rounded-full px-5"
           >

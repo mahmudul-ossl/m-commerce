@@ -87,3 +87,40 @@ export type Paginated<T> = {
     to: number | null;
   };
 };
+
+export type CartItem = {
+  id: number;
+  quantity: number;
+  line_total: number;
+  is_available: boolean;
+  max_quantity: number;
+  variant: {
+    id: number;
+    sku: string;
+    options: Record<string, string>;
+    price: number;
+    current_price: number;
+    stock: number;
+  };
+  product: {
+    id: number;
+    name: string;
+    slug: string;
+    image: string | null;
+  };
+};
+
+export type Cart = {
+  token: string | null;
+  items: CartItem[];
+  count: number;
+  subtotal: number;
+  has_unavailable_items: boolean;
+};
+
+export type User = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+};

@@ -7,11 +7,13 @@ import { useState } from "react";
 import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useUser } from "@/hooks/use-auth";
 import type { Category } from "@/lib/types";
 
 export function MobileNav({ categories }: { categories: Category[] }) {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
+  const { data: user } = useUser();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -63,8 +65,12 @@ export function MobileNav({ categories }: { categories: Category[] }) {
         </nav>
 
         <div className="grid gap-1 border-t p-2">
-          <Link href="/login" onClick={close} className="flex items-center gap-3 rounded-md px-3 py-3 hover:bg-muted">
-            <UserRound className="size-5" /> Sign in / Register
+          <Link
+            href={user ? "/account" : "/login"}
+            onClick={close}
+            className="flex items-center gap-3 rounded-md px-3 py-3 hover:bg-muted"
+          >
+            <UserRound className="size-5" /> {user ? `My account (${user.name.split(" ")[0]})` : "Sign in / Register"}
           </Link>
           <Link href="/track-order" onClick={close} className="flex items-center gap-3 rounded-md px-3 py-3 hover:bg-muted">
             <Package className="size-5" /> Track your order
